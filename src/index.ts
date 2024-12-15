@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 
+
+// Just testing it here
 async function createSpritesheet(
   inputDir: string,
   outputFile: string,
