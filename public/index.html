@@ -13,11 +13,16 @@
     <button type="submit">Generate Spritesheet</button>
   </form>
   <div id="message"></div>
+  <div id="spritesheetContainer">
+    <h2>Generated Spritesheet:</h2>
+    <img id="spritesheet" style="max-width: 100%; max-height: 500px; display: none;" />
+  </div>
 
   <script>
     // Handle form submission
     const form = document.getElementById('uploadForm');
     const messageDiv = document.getElementById('message');
+    const spritesheetImage = document.getElementById('spritesheet');
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -37,6 +42,10 @@
         const result = await response.json();
         if (response.ok) {
           messageDiv.innerText = result.message || 'Spritesheet created successfully!';
+          // Show the spritesheet
+          const spritesheetUrl = '../output/spritesheet.png'; // This is the URL to the generated file
+          spritesheetImage.src = spritesheetUrl;
+          spritesheetImage.style.display = 'block'; // Show the image
         } else {
           messageDiv.innerText = result.error || 'Error occurred';
         }

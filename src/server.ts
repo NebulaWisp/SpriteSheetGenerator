@@ -24,6 +24,9 @@ const upload = multer({ storage });
 // Serve static files from 'public' folder (for front-end assets like HTML, CSS, JS)
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Serve static files from the output directory
+app.use('/output', express.static(path.join(__dirname, '../output')));
+
 // Ensure the output directory exists before attempting to save the spritesheet
 const outputDir = path.join(__dirname, '../output');
 if (!fs.existsSync(outputDir)) {
@@ -94,15 +97,21 @@ app.post('/create-spritesheet', upload.array('images'), async (req, res): Promis
         return res.status(400).json({ error: 'No images uploaded' });
     }
 
-    // console.log('Uploaded files:', files);
-
     const inputDirectory = path.resolve(__dirname, "../images");
     const outputFilePath = path.resolve(__dirname, "../output/spritesheet.png");
-    console.log(inputDirectory)
-    console.log(outputFilePath)
+    console.log(inputDirectory);
+    console.log(outputFilePath);
 
     try {
+        // Generate the spritesheet
         await createSpritesheet(inputDirectory, outputFilePath);
+
+        // Clean up the uploaded files (images)
+        files.forEach((file) => {
+            const filePath = path.join(inputDirectory, file.filename);
+            fs.unlinkSync(filePath); // Delete each uploaded image after the spritesheet is created
+        });
+
         res.status(200).send({ message: "Spritesheet created successfully!" });
     } catch (error: any) {
         res.status(500).send({ error: error.message });
