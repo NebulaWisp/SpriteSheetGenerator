@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spritesheet Generator</title>
+</head>
+<body>
+  <h1>Spritesheet Generator</h1>
+  <form id="uploadForm">
+    <label for="fileInput">Choose Images:</label>
+    <input type="file" id="fileInput" name="images" accept="image/*" multiple>
+    <button type="submit">Generate Spritesheet</button>
+  </form>
+  <div id="message"></div>
+
+  <script>
+    // Handle form submission
+    const form = document.getElementById('uploadForm');
+    const messageDiv = document.getElementById('message');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData();
+      const files = document.getElementById('fileInput').files;
+      if (files) {
+        for (let file of files) {
+          formData.append('images', file);
+        }
+      }
+
+      try {
+        const response = await fetch('/create-spritesheet', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await response.json();
+        if (response.ok) {
+          messageDiv.innerText = result.message || 'Spritesheet created successfully!';
+        } else {
+          messageDiv.innerText = result.error || 'Error occurred';
+        }
+      } catch (error) {
+        messageDiv.innerText = 'Failed to create spritesheet.';
+      }
+    });
+  </script>
+</body>
+</html>
