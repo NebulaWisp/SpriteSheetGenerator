@@ -25,12 +25,24 @@ const upload = multer({ storage });
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve static files from the output directory
-app.use('/output', express.static(path.join(__dirname, '../output')));
+app.use('/output', express.static(path.join(__dirname, '../output'), {
+    setHeaders: (res, path) => {
+        res.set('Cache-Control', 'no-store'); // Prevent caching
+    }
+}));
+// Serve static files from the output directory
+app.use('/images', express.static(path.join(__dirname, '../images')));
 
 // Ensure the output directory exists before attempting to save the spritesheet
 const outputDir = path.join(__dirname, '../output');
 if (!fs.existsSync(outputDir)) {
   fs.mkdirSync(outputDir);
+}
+
+// Ensure the output directory exists before attempting to save the spritesheet
+const imageDir = path.join(__dirname, '../images');
+if (!fs.existsSync(imageDir)) {
+  fs.mkdirSync(imageDir);
 }
 
 // Function to create the spritesheet
@@ -113,6 +125,7 @@ app.post('/create-spritesheet', upload.array('images'), async (req, res): Promis
         });
 
         res.status(200).send({ message: "Spritesheet created successfully!" });
+
     } catch (error: any) {
         res.status(500).send({ error: error.message });
     }
